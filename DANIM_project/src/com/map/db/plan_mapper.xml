@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.map.plan_mapper">
+	
+	<resultMap type="planDto" id="planDto">
+		<result property="pno" column="PNO"/>
+		<result property="ptitle" column="PTITLE"/>
+		<result property="psdate" column="PSDATE"/>
+		<result property="pldate" column="PLDATE"/>
+		<result property="pdata" column="PDATA"/>
+		<result property="pimage" column="PIMAGE"/>
+		<result property="id" column="ID"/>	
+	</resultMap>
+	
+	<insert id="insertPlan" parameterType="planDto">
+		INSERT INTO PLAN VALUES(PLANSEQUENCE.NEXTVAL,#{ptitle},#{psdate},#{pldate},#{pdata},#{pimage},#{id})
+	</insert>
+	
+	<select id="selectPno" parameterType="planDto" resultType="String">
+		SELECT PNO 
+		FROM PLAN 
+		WHERE PSDATE = #{psdate } AND PLDATE = #{pldate } AND PTITLE = #{ptitle} AND ID = #{id} 
+	</select>
+	
+	<select id="diaryList" parameterType="String" resultType="planDto">
+		SELECT PNO,PTITLE,PSDATE,PLDATE,PDATA,PIMAGE,ID
+		FROM PLAN 
+		WHERE ID = #{id}
+		ORDER BY PSDATE DESC
+	</select>
+	
+	<select id="selectOne" parameterType="String" resultType="planDto">
+		SELECT PNO,PTITLE,PSDATE,PLDATE,PDATA,PIMAGE,ID 
+		FROM PLAN 
+		WHERE PNO = #{pno }
+	</select>
+	
+	<delete id="deletePlan" parameterType="String">
+  		DELETE FROM PLAN WHERE PNO = #{pno }
+ 	</delete>
+ 	
+ 	<delete id="muldel" parameterType="hashmap">
+  	DELETE FROM PLAN WHERE PNO IN
+  		<foreach item="item" index="index" collection="seqs" separator="," open="("  close=")">
+  	   		#{item}
+		</foreach>  	
+   </delete>
+   
+   <select id="mainList" resultType="planDto">
+		SELECT PNO,PTITLE,PSDATE,PLDATE,PDATA,PIMAGE,ID
+		FROM (SELECT PNO,PTITLE,PSDATE,PLDATE,PDATA,PIMAGE,ID FROM PLAN ORDER BY PNO DESC ) WHERE <![CDATA[ROWNUM<5]]>
+	</select>
+
+</mapper>

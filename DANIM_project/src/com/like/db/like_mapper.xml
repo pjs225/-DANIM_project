@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.like.mapper">
+
+	<resultMap type="LikeDto" id="cmtMap">
+		<result property="id" column="ID" />
+		<result property="boardno" column="BOARDNO"/>
+	</resultMap>
+
+  <select id="isLiked" parameterType="likeDto" resultType="int">
+    SELECT COUNT(*) FROM USERLIKE WHERE BOARDNO = #{boardno } AND ID = #{id }
+  </select>
+  
+  <insert id="insertLike" parameterType="likeDto">
+  	INSERT INTO USERLIKE VALUES(#{id },#{boardno })
+  </insert>
+  
+  <delete id="deleteLike" parameterType="likeDto">
+  	DELETE FROM USERLIKE WHERE BOARDNO = #{boardno } AND ID = #{id }
+  </delete>
+  
+</mapper>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.board.mapper">
+
+	<resultMap type="BoardDto" id="boardMap">
+		<result property="boardno" column="BOARDNO" />
+		<result property="id" column="ID" />
+		<result property="title" column="TITLE" />
+		<result property="likenum" column="LIKENUM" />
+		<result property="regdate" column="REGDATE"/>
+		<result property="viewcount" column="VIEWCOUNT"/>
+		<result property="filename" column="FILENAME"/>
+		<result property="content" column="CONTENT"/>
+	</resultMap>
+	
+	<!-- 전체 게시글 SELECT -->
+	<select id="selectList" resultType="BoardDto">
+		SELECT BOARDNO,ID,TITLE,LIKENUM,REGDATE,VIEWCOUNT,FILENAME,CONTENT
+		FROM BOARD
+		ORDER BY BOARDNO DESC
+	</select>
+	
+	<!-- 게시글수 COUNT -->
+	<select id="getCount" resultType="int">
+		SELECT COUNT(*)
+		FROM BOARD
+	</select>
+
+	<!-- 페이징 처리를 위한 SELECT -->
+	<select id="getPaging_old" parameterType="map" resultType="BoardDto">
+		SELECT BOARDNO,ID,TITLE,LIKENUM,REGDATE,VIEWCOUNT,FILENAME,CONTENT
+		FROM (SELECT A.*,ROW_NUMBER() OVER(ORDER BY BOARDNO DESC) AS RNUM FROM BOARD A)
+		WHERE RNUM BETWEEN #{startPageNo,jdbcType=INTEGER} AND #{endPageNo,jdbcType=INTEGER}
+	</select>
+	
+	<select id="getPaging" parameterType="map" resultType="BoardDto">
+	SELECT BOARDNO,ID,TITLE,LIKENUM,REGDATE,VIEWCOUNT,FILENAME,CONTENT
+	FROM (SELECT A.*,ROW_NUMBER() OVER(ORDER BY BOARDNO DESC) AS RNUM FROM BOARD A)
+	WHERE RNUM BETWEEN #{startPageNo,jdbcType=INTEGER} AND #{endPageNo,jdbcType=INTEGER}
+	</select>
+	
+	<!-- 게시글 보기 -->
+	<select  id="selectOne" parameterType="int" resultType="BoardDto">
+		SELECT BOARDNO,ID,TITLE,(SELECT COUNT(*) FROM USERLIKE WHERE BOARDNO = #{boardno}) AS LIKENUM,REGDATE,VIEWCOUNT,FILENAME,CONTENT
+		FROM BOARD
+		WHERE BOARDNO = #{boardno}
+	</select>
+	
+	<!-- 게시글 추가 -->
+	<insert id="insert" parameterType="BoardDto">
+		INSERT INTO BOARD
+		VALUES(BOARDSEQ.NEXTVAL,#{id},#{title,jdbcType=VARCHAR},#{likenum},SYSDATE,#{viewcount},#{filename},#{content})
+	</insert>	
+	
+	<!-- 게시글 수정 -->
+	<update id="update" parameterType="BoardDto">
+		UPDATE BOARD
+		SET TITLE=#{title},CONTENT=#{content}
+		WHERE BOARDNO=#{boardno}
+	</update>
+	
+	<!-- 게시글 삭제 -->
+	<delete id='delete' parameterType='int'>
+		DELETE FROM BOARD
+		WHERE BOARDNO=#{boardno}
+	</delete>
+	
+	<!-- 아이디별 게시글 -->
+	<select  id="idList" parameterType="String" resultType="BoardDto">
+		SELECT BOARDNO,ID,TITLE,LIKENUM,REGDATE,VIEWCOUNT,FILENAME,CONTENT
+		FROM BOARD
+		WHERE ID=#{id}
+		ORDER BY BOARDNO DESC
+	</select>
+	 
+	<!-- 마이페이지 muldel -->
+	<delete id="muldel" parameterType="hashmap">
+  	DELETE FROM BOARD WHERE BOARDNO IN
+  		<foreach item="item" index="index" collection="seqs" separator="," open="("  close=")">
+  	   		#{item}
+		</foreach>  	
+   </delete>
+   
+   <!-- 파일이름가져오기 -->
+  <select id="filename" parameterType="int" resultType="String">
+  SELECT #{filename}
+  FROM BOARD
+  </select>
+  
+	<!-- main 게시글 미리보기 -->
+	<select id="selectMain" resultType="BoardDto">
+	<![CDATA[ 
+		SELECT * FROM
+		(SELECT BOARDNO,ID,TITLE,LIKENUM,REGDATE,VIEWCOUNT,FILENAME,CONTENT, ROWNUM
+		FROM BOARD
+		ORDER BY BOARDNO DESC)
+		WHERE ROWNUM < 6
+	]]> 
+	</select>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

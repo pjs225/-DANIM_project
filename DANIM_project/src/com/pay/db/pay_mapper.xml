@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pay.mapper">
+
+	<resultMap type="payDto" id="payMap">
+		<result property="paynum" column="PAYNUM"/>
+		<result property="id" column="ID"/>
+		<result property="buydate" column="BUYDATE"/>
+		<result property="paymoney" column="PAYMONEY"/>
+	</resultMap>
+	
+	<insert id="payInsert" parameterType="payDto">
+		INSERT INTO USEPAY VALUES(#{paynum},#{id},SYSDATE,#{paymoney})
+	</insert>
+
+	<select  id="payList" parameterType="String" resultType="payDto">
+		SELECT PAYNUM,ID,BUYDATE,PAYMONEY
+		FROM USEPAY
+		WHERE ID=#{id}
+		ORDER BY BUYDATE ASC 
+	</select>
+ 
+
+</mapper>
